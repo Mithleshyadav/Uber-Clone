@@ -10,12 +10,12 @@ router.post('/register', [ body('email').isEmail().withMessage('Invalid Email'),
 userController.registerUser
 )
 
-// router.post('/login', [
-//   body('email').isEmail().withMessage('Invalid Email'),
-//   body('password').isLength({min: 6}).withMessage('Password Invalid')
-// ],
-// userController.loginUser
-// )
+router.post('/login', [
+  body('email').isEmail().withMessage('Invalid Email'),
+  body('password').isLength({min: 6}).withMessage('Password Invalid')
+],
+userController.loginUser
+)
 
 
 
