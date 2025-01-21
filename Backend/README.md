@@ -200,3 +200,96 @@ Content-Type: application/json
 }
 ```
 
+---
+
+## Endpoint: `/users/profile`
+
+### Description
+The `/users/profile` endpoint retrieves the profile details of the authenticated user.
+
+### Method
+`GET`
+
+### Headers
+| Field           | Required | Description                             |
+|-----------------|----------|-----------------------------------------|
+| `Authorization` | Yes      | Bearer token for user authentication.  |
+
+### Response
+#### Success Response
+If the request is authenticated successfully, the server responds with:
+
+- **Status Code**: `200 OK`
+- **Response Body**:
+
+  ```json
+  {
+    "_id": "<user_id>",
+    "fullname": {
+      "firstname": "<firstname>",
+      "lastname": "<lastname>"
+    },
+    "email": "<email>"
+  }
+  ```
+
+#### Error Responses
+- **Status Code**: `401 Unauthorized`
+  - If the token is invalid, expired, or blacklisted, the response contains:
+    ```json
+    {
+      "message": "Unauthorized"
+    }
+    ```
+
+- **Status Code**: `500 Internal Server Error`
+  - If there is a server-side issue or an unexpected error.
+
+---
+
+## Endpoint: `/users/logout`
+
+### Description
+The `/users/logout` endpoint logs out the authenticated user by blacklisting the token and clearing the session cookie.
+
+### Method
+`GET`
+
+### Headers
+| Field           | Required | Description                             |
+|-----------------|----------|-----------------------------------------|
+| `Authorization` | Yes      | Bearer token for user authentication.  |
+
+### Response
+#### Success Response
+If the logout is successful, the server responds with:
+
+- **Status Code**: `200 OK`
+- **Response Body**:
+
+  ```json
+  {
+    "message": "Logged out successfully"
+  }
+  ```
+
+#### Error Responses
+- **Status Code**: `400 Bad Request`
+  - If no token is provided, the response contains:
+    ```json
+    {
+      "message": "No token provided for logout"
+    }
+    ```
+
+- **Status Code**: `401 Unauthorized`
+  - If the token is invalid, expired, or blacklisted, the response contains:
+    ```json
+    {
+      "message": "Unauthorized"
+    }
+    ```
+
+- **Status Code**: `500 Internal Server Error`
+  - If there is a server-side issue or an unexpected error.
+
