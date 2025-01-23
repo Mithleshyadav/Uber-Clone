@@ -293,3 +293,38 @@ If the logout is successful, the server responds with:
 - **Status Code**: `500 Internal Server Error`
   - If there is a server-side issue or an unexpected error.
 
+
+
+Register Captain API Endpoint
+POST /captains/register
+
+Request Body:
+json
+Copy
+Edit
+{
+  "fullname": {
+    "firstname": "John",
+    "lastname": "Doe"
+  },
+  "email": "john.doe@example.com",
+  "password": "password123",
+  "vehicle": {
+    "color": "red",
+    "plate": "AB123CD",
+    "capacity": 4,
+    "vehicleType": "car"
+  }
+}
+Response:
+json
+Copy
+Edit
+{
+  "token": "jwt_token_here",
+  "captain": { ... }
+}
+Errors:
+400 Bad Request: Validation errors or missing fields.
+400 Conflict: Captain already exists.
+
