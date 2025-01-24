@@ -331,9 +331,7 @@ If the logout is successful, the server responds with:
 - **Status Code**: `500 Internal Server Error`
   - If there is a server-side issue or an unexpected error.
 
-# Creating the concise version of the README.md content for /captains/register endpoint
 
-short_readme_content = """
 # Captain Endpoint Documentation
 
 ## Endpoint: `/captains/register`
@@ -400,44 +398,6 @@ Content-Type: application/json
 
 
 
-# Captain API - README
-
-## Overview
-The Captain API provides endpoints for managing captains, including registration, login, profile retrieval, and logout functionality. This README serves as a guide to understand and use the API effectively.
-
-## Features
-- **Captain Registration**: Register captains with vehicle details.
-- **Captain Login**: Authenticate captains and generate JWT tokens.
-- **Profile Retrieval**: Fetch the authenticated captain's profile.
-- **Logout**: Blacklist tokens and clear authentication cookies.
-
-## Getting Started
-
-### Prerequisites
-- Node.js (v14 or later)
-- MongoDB
-- A `.env` file with the following variables:
-  ```env
-  JWT_SECRET=your_jwt_secret
-  MONGO_URI=your_mongo_connection_string
-  ```
-
-### Installation
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd <repository-directory>
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the server:
-   ```bash
-   npm start
-   ```
-
-The API will be available at `http://localhost:3000`.
 
 ## API Endpoints
 
@@ -532,29 +492,4 @@ The API will be available at `http://localhost:3000`.
 {
   "message": "Captain logged out successfully"
 }
-```
-
----
-
-## Middleware
-
-### Authentication Middleware:
-- Verifies the provided JWT token.
-- Ensures the token is not blacklisted.
-- Attaches the authenticated captain to the request object (`req.captain`).
-
-**Example Header:**
-```http
-Authorization: Bearer <token>
-```
-
-### Validation Middleware:
-- Email must be in valid format.
-- Password must meet minimum length requirements.
-- Vehicle details (if applicable) must meet specific criteria.
-
----
-
-## Error Handling
-All errors are handled using a centralized error handler, ensuring consistent error responses across endpoints.
-
+````
