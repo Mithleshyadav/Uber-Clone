@@ -396,3 +396,165 @@ Content-Type: application/json
     "vehicle": { "color": "red", "plate": "AB123CD", "capacity": 4, "vehicleType": "car" }
   }
 }
+
+
+
+
+# Captain API - README
+
+## Overview
+The Captain API provides endpoints for managing captains, including registration, login, profile retrieval, and logout functionality. This README serves as a guide to understand and use the API effectively.
+
+## Features
+- **Captain Registration**: Register captains with vehicle details.
+- **Captain Login**: Authenticate captains and generate JWT tokens.
+- **Profile Retrieval**: Fetch the authenticated captain's profile.
+- **Logout**: Blacklist tokens and clear authentication cookies.
+
+## Getting Started
+
+### Prerequisites
+- Node.js (v14 or later)
+- MongoDB
+- A `.env` file with the following variables:
+  ```env
+  JWT_SECRET=your_jwt_secret
+  MONGO_URI=your_mongo_connection_string
+  ```
+
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd <repository-directory>
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the server:
+   ```bash
+   npm start
+   ```
+
+The API will be available at `http://localhost:3000`.
+
+## API Endpoints
+
+### 1. **Login Captain**
+#### `POST /captain/login`
+**Description:** Logs in a captain and provides an authentication token.
+
+**Request Body:**
+```json
+{
+  "email": "string", // Valid email address
+  "password": "string" // Minimum 6 characters
+}
+```
+
+**Response:**
+- **Success (200):**
+```json
+{
+  "token": "string", // JWT token for authentication
+  "captain": {
+    "_id": "string",
+    "fullname": {
+      "firstname": "string",
+      "lastname": "string"
+    },
+    "email": "string",
+    "vehicle": {
+      "color": "string",
+      "plate": "string",
+      "capacity": "number",
+      "vehicleType": "string"
+    },
+    "status": "string"
+  }
+}
+```
+- **Error (400 or 401):**
+```json
+{
+  "message": "Invalid email or password"
+}
+```
+
+---
+
+### 2. **Get Captain Profile**
+#### `GET /captain/profile`
+**Description:** Retrieves the authenticated captain's profile.
+
+**Authentication:**
+- Requires a valid JWT token in the `Authorization` header or `token` cookie.
+
+**Response:**
+- **Success (200):**
+```json
+{
+  "_id": "string",
+  "fullname": {
+    "firstname": "string",
+    "lastname": "string"
+  },
+  "email": "string",
+  "vehicle": {
+    "color": "string",
+    "plate": "string",
+    "capacity": "number",
+    "vehicleType": "string"
+  },
+  "status": "string"
+}
+```
+- **Error (401):**
+```json
+{
+  "message": "Unauthorized"
+}
+```
+
+---
+
+### 3. **Logout Captain**
+#### `GET /captain/logout`
+**Description:** Logs out the captain by blacklisting the token and clearing cookies.
+
+**Authentication:**
+- Requires a valid JWT token in the `Authorization` header or `token` cookie.
+
+**Response:**
+- **Success (200):**
+```json
+{
+  "message": "Captain logged out successfully"
+}
+```
+
+---
+
+## Middleware
+
+### Authentication Middleware:
+- Verifies the provided JWT token.
+- Ensures the token is not blacklisted.
+- Attaches the authenticated captain to the request object (`req.captain`).
+
+**Example Header:**
+```http
+Authorization: Bearer <token>
+```
+
+### Validation Middleware:
+- Email must be in valid format.
+- Password must meet minimum length requirements.
+- Vehicle details (if applicable) must meet specific criteria.
+
+---
+
+## Error Handling
+All errors are handled using a centralized error handler, ensuring consistent error responses across endpoints.
+
