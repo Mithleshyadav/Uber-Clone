@@ -34,14 +34,6 @@ module.exports.registerCaptain = async (req, res, next) => {
             vehicleType: vehicle.vehicleType,
         });
 
-        // Log the captain object to inspect what is being returned
-        // console.log("Captain object:", captain);
-        // console.log("Is captain a Mongoose instance?", captain instanceof captainModel);
-
-        // Ensure captain is a valid Mongoose instance
-        // if (!captain || !(captain instanceof captainModel)) {
-        //     throw new Error('Captain creation failed or invalid captain instance');
-        // }
 
         // Generate authentication token
         const token = await captain.generateAuthToken();
@@ -106,3 +98,10 @@ module.exports.logoutCaptain = async (req, res, next) => {
     res.clearCookie('token');
     res.status(200).json({ message: 'Captain logged out Successfully' });
 }
+
+
+
+
+
+
+

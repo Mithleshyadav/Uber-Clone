@@ -1,5 +1,7 @@
-import React ,{ useState} from 'react'
-import { Link } from 'react-router-dom'
+import React ,{ useState, useContext} from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import {UserDataContext} from '../context/UserContext'
 
 
 const UserSignup = () => {
@@ -8,24 +10,37 @@ const UserSignup = () => {
   const [password, setPassword] = useState('')   
   const [firstName, setFirstName] = useState('')    
   const [lastName, setLastName] = useState('')
-  const [userData, setUserData] = useState('')
+  
+
+  const navigate = useNavigate();
+  const [user, setUser] = useContext(UserDataContext);
    
-    const submitHandler = (e) =>{
+    const submitHandler = async (e) =>{
       e.preventDefault();
-      setUserData({
-        fullName: {
-        firstName: firstName,
-        lastName: lastName
+     const newUser = {
+      fullname: {
+        firstname: firstName,
+        lastname: lastName
         },
         email: email,
         password: password
-      })
-      console.log(userData);
+     }
+
+     const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`, newUser)
+     if(response.status === 201){
+      const data = response.data
+
+      setUser(data.user)
+      localStorage.setItem('token', data.token)
+      navigate('/home')
+     }
+
       setEmail('')
       setPassword('')
       setFirstName('')
       setLastName('')
     }
+     
   
   return (
     <div className='p-7 h-screen flex flex-col justify-between'>
@@ -61,7 +76,7 @@ const UserSignup = () => {
         onChange={(e)=>{setPassword(e.target.value)}}
         type="password" placeholder='password' />
 
-        <button className='w-full bg-[#111] text-white rounded font-semibold px-4 py-2 text-lg placeholder:text-base'>Create</button>
+        <button className='w-full bg-[#111] text-white rounded font-semibold px-4 py-2 text-lg placeholder:text-base'>Create account </button>
 
       </form>
         <p className='text-center mt-3'> Already have an Account?<Link to='/login' className='text-blue-600'>Login here</Link></p>
@@ -74,4 +89,3 @@ const UserSignup = () => {
 }
 
 export default UserSignup
-// By proceeding, you concent to get calls, WhatsApp or SMS messages, including by automated means, from Uber and it affiliates to te number provided.

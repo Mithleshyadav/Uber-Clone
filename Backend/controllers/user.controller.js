@@ -10,9 +10,8 @@ module.exports.registerUser = async (req, res, next) => {
     return res.status(400).json({errors:errors.array() });
   }
 
-
-
   const {fullname,email, password} = req.body;
+ 
 
 const isUserAlreadyExist = await userModel.findOne({email});
 
@@ -56,7 +55,7 @@ module.exports.loginUser = async (req, res, next) => {
 
   const token = user.generateAuthToken();
   res.cookie('token', token);
-  res.status(200).json({token, user});
+  res.status(201).json({token, user});
 }
 
 module.exports.getUserProfile =  (req, res, next) => {
