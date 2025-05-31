@@ -84,8 +84,7 @@ module.exports.getAutoCompleteSuggestions = async (input) => {
 
     const suggestions = response.data.features.map(feature => ({
       label: feature.properties.label,
-      lat: feature.geometry.coordinates[1],
-      lon: feature.geometry.coordinates[0]
+      
     }));
 
     return suggestions;
