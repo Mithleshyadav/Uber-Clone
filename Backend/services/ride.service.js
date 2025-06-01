@@ -47,7 +47,36 @@ const getFare = async (pickup, destination) => {
 
   return fare;
 };
-
-
+module.exports.getFare = getFare;
 
 module.exports.getFare = getFare;
+
+function getOtp(num) {
+  const min = Math.pow(10, num - 1); // e.g., 100000 for 6-digit
+  const max = Math.pow(10, num);     // e.g., 1000000
+  const otp = crypto.randomInt(min, max).toString();
+  console.log('OTP:', otp)
+  return otp;
+
+}
+
+
+
+module.exports.createRide = async ({
+  user, pickup, destination, vehicleType
+}) => {
+  if (!user || !pickup || !destination || !vehicleType) {
+    throw new Error('All fields are required');
+  }
+  const fare = await getFare( pickup, destination);
+
+  const ride = await rideModel.create({
+    user,
+    pickup,
+    destination,
+    vehicleType,
+    otp: getOtp(6),
+    fare: fare[vehicleType]
+  })
+  return ride;
+}

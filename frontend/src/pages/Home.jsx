@@ -22,9 +22,7 @@ const [ vehicleType, setVehicleType ] = useState('')
 const [fare, setFare ] = useState('')
 
 const handlePickupChange = async (e) => {
-         console.log(import.meta.env.VITE_BASE_URL)
         setPickup(e.target.value)
-        console.log(e.target.value)
         try {
             const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-autocomplete-suggestions`, {
                 params: { input: e.target.value },
@@ -33,7 +31,6 @@ const handlePickupChange = async (e) => {
                 }
 
             })
-            console.log(response.data)
             setPickupSuggestions(response.data)
         } catch {
             // handle error
@@ -42,7 +39,6 @@ const handlePickupChange = async (e) => {
 
     const handleDestinationChange = async (e) => {
         setDestination(e.target.value)
-        console.log("Fetching suggestions for:", e.target.value);
         
         try {
           const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-autocomplete-suggestions`, {
@@ -51,7 +47,7 @@ const handlePickupChange = async (e) => {
               Authorization: `Bearer ${localStorage.getItem('token')}`
             }
           })
-          console.log("Received suggestions:", response.data);
+         
             setDestinationSuggestions(response.data)
         } catch {
             // handle error
