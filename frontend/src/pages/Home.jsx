@@ -4,6 +4,7 @@ import "remixicon/fonts/remixicon.css";
 import gsap from "gsap";
 import LocationSearchPanel from '../components/LocationSearchPanel';
 import VehiclePanel from '../components/VehiclePanel';
+import ConfirmRide from '../components/ConfirmRide';
 
 const Home = () => {
 const [ pickup, setPickup ] = useState('')
@@ -20,6 +21,68 @@ const [ vehiclePanel, setVehiclePanel ] = useState(false)
 const [ confirmRidePanel, setConfirmRidePanel ] = useState('')
 const [ vehicleType, setVehicleType ] = useState('')
 const [fare, setFare ] = useState('')
+const [ vehicleFound, setVehicleFound ] = useState(false);
+
+
+    useEffect(() => {
+    if (vehiclePanel) {
+        gsap.to(vehiclePanelRef.current, {
+            transform: 'translateY(0)'
+        });
+    } else {
+        gsap.to(vehiclePanelRef.current, {
+            transform: 'translateY(100%)'
+        });
+    }
+}, [vehiclePanel]);
+
+useEffect(() => {
+  if (confirmRidePanel) {
+    gsap.to(confirmRidePanelRef.current, {
+      transform: 'translateY(0)'
+    });
+  } else {
+    gsap.to(confirmRidePanelRef.current, {
+      transform: 'translateY(100%)'
+    });
+  }
+}, [confirmRidePanel]);
+
+       
+
+useEffect(() => {
+    if (panelOpen) {
+      gsap.to(panelRef.current, {
+        height: "70%",
+        padding: 24,
+      });
+      gsap.to(panelCloseRef.current, {
+        opacity: 1,
+      });
+    } else {
+      gsap.to(panelRef.current, {
+        height: "0%",
+        padding: 0,
+      });
+      gsap.to(panelCloseRef.current, {
+        opacity: 0,
+      });
+    }
+  }, [panelOpen]);
+
+  useEffect(() => {
+    if (vehiclePanel) {
+        gsap.to(vehiclePanelRef.current, {
+            transform: 'translateY(0)'
+        })
+    } else {
+        gsap.to(vehiclePanelRef.current, {
+            transform: 'translateY(100%)'
+        });
+    }
+}, [vehiclePanel]);
+
+
 
 const handlePickupChange = async (e) => {
         setPickup(e.target.value)
@@ -57,52 +120,30 @@ const handlePickupChange = async (e) => {
     async function findTrip() {
        setVehiclePanel(true)
         setPanelOpen(false)
-    }
-    useEffect(() => {
-    if (vehiclePanel) {
-        gsap.to(vehiclePanelRef.current, {
-            transform: 'translateY(0)'
-        });
-    } else {
-        gsap.to(vehiclePanelRef.current, {
-            transform: 'translateY(100%)'
-        });
-    }
-}, [vehiclePanel]);
-       
 
-useEffect(() => {
-    if (panelOpen) {
-      gsap.to(panelRef.current, {
-        height: "70%",
-        padding: 24,
-      });
-      gsap.to(panelCloseRef.current, {
-        opacity: 1,
-      });
-    } else {
-      gsap.to(panelRef.current, {
-        height: "0%",
-        padding: 0,
-      });
-      gsap.to(panelCloseRef.current, {
-        opacity: 0,
-      });
-    }
-  }, [panelOpen]);
+       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/get-fare`, {
+        params: { pickup, destination},
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      }) 
+    setFare(response.data)
+ }
 
-  useEffect(() => {
-    if (vehiclePanel) {
-        gsap.to(vehiclePanelRef.current, {
-            transform: 'translateY(0)'
+
+  async function createRide() {
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/create-ride`, {
+            pickup,
+            destination,
+            vehicleType
+        }, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
         })
-    } else {
-        gsap.to(vehiclePanelRef.current, {
-            transform: 'translateY(100%)'
-        });
-    }
-}, [vehiclePanel]);
 
+
+    }
 
 
   return (
@@ -174,6 +215,17 @@ useEffect(() => {
                     selectVehicle={setVehicleType}
                     fare={fare} setConfirmRidePanel={setConfirmRidePanel} setVehiclePanel={setVehiclePanel} />
             </div>
+
+             <div ref={confirmRidePanelRef} className='fixed w-full z-10 bottom-0 translate-y-full bg-white px-3 py-6 pt-12'>
+                <ConfirmRide
+                    createRide={createRide}
+                    pickup={pickup}
+                    destination={destination}
+                    fare={fare}
+                    vehicleType={vehicleType}
+
+                    setConfirmRidePanel={setConfirmRidePanel} setVehicleFound={setVehicleFound} />
+            </div> 
 
     </div>
   );
