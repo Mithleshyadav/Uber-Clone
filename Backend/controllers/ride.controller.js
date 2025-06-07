@@ -13,6 +13,7 @@ module.exports.getFare = async (req, res) => {
 
   try {
     const fare = await rideService.getFare(pickup, destination);
+    console.log(fare);
     return res.status(200).json(fare);
 
   } catch (err) {
@@ -33,7 +34,7 @@ module.exports.createRide = async (req, res) => {
 
   try {
     const ride = await rideService.createRide({user:req.user._id, pickup, destination, vehicleType});
-
+    console.log(ride);
     return res.status(201).json(ride);
     ride.otp = "";
   }
