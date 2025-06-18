@@ -29,7 +29,7 @@ const [ vehicleType, setVehicleType ] = useState('')
 const [fare, setFare ] = useState('')
 const [ vehicleFound, setVehicleFound ] = useState(false);
 const [waitingForDriver, setWaitingForDriver ]= useState(false);
-
+const [ride, setRide] = useState(null)
 
 useEffect(() => {
     if (panelOpen) {
@@ -161,7 +161,8 @@ const handlePickupChange = async (e) => {
             headers: {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }
-        })
+        });
+        setRide(response.data);
 
 
     }

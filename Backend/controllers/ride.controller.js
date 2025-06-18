@@ -1,7 +1,7 @@
 const rideService = require('../services/ride.service');
 const { validationResult } = require('express-validator');
-//const mapService = require('../services/maps.service');
-//const rideModel = require('../models/ride.model');
+const mapService = require('../services/maps.service');
+const rideModel = require('../models/ride.model');
 
 module.exports.getFare = async (req, res) => {
   const errors = validationResult(req);
@@ -35,12 +35,59 @@ module.exports.createRide = async (req, res) => {
   try {
     const ride = await rideService.createRide({user:req.user._id, pickup, destination, vehicleType});
     console.log(ride);
-    return res.status(201).json(ride);
+    res.status(201).json(ride);
+
+    const pickupCoords = await mapService.getAddressCoordinate(pickup);
+
+    const captainsInTheRadius = await rideService.getCaptainsInTheRadius(pickupCoords.ltd, pickupCoords.lng, 2);
+
+    // // 6. Notify each captain via socket
+    // captainsInTheRadius.forEach((captain) => {
+    //   sendMessageToSocketId(captain.socketId, {
+    //     event: "newRide",
+    //     data: rideWithUser,
+    //   });
+    // });
+    
+    console.log('Captains in the radius:', captainsInTheRadius)
     ride.otp = "";
+
+    const rideWithUser = await rideModel.findOne({ _id: ride._id }).populate('user');
+
+    captainsInTheRadius.map(captain => {
+      sendMessageToSocketId(captain.socketId, {
+        event: 'newRide',
+        data: rideWithUser
+      })
+    })
+
   }
   catch (err) {
     return res.status(500).json({ message: err.message
-
+ 
     })
+  }
+}
+
+module.exports.confirmRide = async (req, res) => {
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.status(400).json({errors: errors.array()});
+
+  }
+  const { rideId } = req.body;
+
+  try {
+    const ride = await rideService.confirmRide({rideId, captain: req.captain});
+
+    sendMessageToSocketId(ride.user.socketId, {
+      event: 'rideConfirmed',
+      data: ride
+    })
+    return res.status(200).json(ride);
+    
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: err.message});
   }
 }

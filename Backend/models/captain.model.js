@@ -58,13 +58,17 @@ const captainSchema = new mongoose.Schema({
     },
   },
   location: {
-    lat: {
-      type: Number,
-    },
-    lng: {
-      type: Number,
-    },
+  type: {
+    type: String,
+    enum: ['Point'],
+    default: 'Point',
   },
+  coordinates: {
+    type: [Number], // [longitude, latitude]
+    required: true,
+  },
+},
+
 });
 
 // Instance method to generate an authentication token

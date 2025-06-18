@@ -93,3 +93,39 @@ module.exports.getAutoCompleteSuggestions = async (input) => {
     throw new Error('Unable to fetch autocomplete suggestions');
   }
 };
+
+
+module.exports.getCaptainsInTheRadius = async (ltd, lng, radiusInKm) => {
+    const radiusInMeters = radiusInKm * 1000;
+
+    const polygon = await getIsochronePolygon(ltd, lng, radiusInMeters);
+
+    const captains = await captainModel.find({
+        location: {
+            $geoWithin: {
+                $geometry: polygon
+            }
+        }
+    });
+
+    return captains;
+};
+
+
+async function getIsochronePolygon(lat, lng, radiusInMeters) {
+    const response = await axios.post(
+        'https://api.openrouteservice.org/v2/isochrones/driving-car',
+        {
+            locations: [[lng, lat]], // ORS uses [lng, lat]
+            range: [radiusInMeters], // In meters
+        },
+        {
+            headers: {
+                'Authorization': 'ORS_API_KEY',
+                'Content-Type': 'application/json'
+            }
+        }
+    );
+
+    return response.data.features[0].geometry;
+}
