@@ -41,13 +41,13 @@ module.exports.createRide = async (req, res) => {
 
     const captainsInTheRadius = await rideService.getCaptainsInTheRadius(pickupCoords.ltd, pickupCoords.lng, 2);
 
-    // // 6. Notify each captain via socket
-    // captainsInTheRadius.forEach((captain) => {
-    //   sendMessageToSocketId(captain.socketId, {
-    //     event: "newRide",
-    //     data: rideWithUser,
-    //   });
-    // });
+    // 6. Notify each captain via socket
+    captainsInTheRadius.forEach((captain) => {
+      sendMessageToSocketId(captain.socketId, {
+        event: "newRide",
+        data: rideWithUser,
+      });
+    });
     
     console.log('Captains in the radius:', captainsInTheRadius)
     ride.otp = "";

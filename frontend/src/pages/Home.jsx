@@ -1,4 +1,4 @@
-import React, { useState,useRef, useEffect } from "react";
+import React, { useState,useRef, useEffect, useContext } from "react";
 import axios from 'axios'
 import "remixicon/fonts/remixicon.css";
 import gsap from "gsap";
@@ -8,6 +8,8 @@ import ConfirmRide from '../components/ConfirmRide';
 import LiveTracking from '../components/LiveTracking';
 import LookingForDriver from '../components/LookingForDriver';
 import WaitingForDriver from '../components/WaitingForDriver';
+import { SocketContext } from "../context/SocketContext";
+import {UserDataContext} from "../context/SocketContext";
 
 const Home = () => {
 const [ pickup, setPickup ] = useState('')
@@ -30,6 +32,14 @@ const [fare, setFare ] = useState('')
 const [ vehicleFound, setVehicleFound ] = useState(false);
 const [waitingForDriver, setWaitingForDriver ]= useState(false);
 const [ride, setRide] = useState(null)
+
+const {socket} = useContext(SocketContext);
+const {user} = useContext(UserDataContext)
+
+
+useEffect(() => {
+  socket.emit('join', {userType: "user", userId:user._id})
+}, [user])
 
 useEffect(() => {
     if (panelOpen) {
