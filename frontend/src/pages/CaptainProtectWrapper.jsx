@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CaptainDataContext } from '../context/CaptainContext'
+import axios from 'axios'
 
 const captainProtectWrapper = ({children}) => {
 
@@ -23,6 +24,8 @@ const captainProtectWrapper = ({children}) => {
     }).then((Response) => {
       if(Response.status === 2000){
         setCaptain(Response.data.captain)
+        console.log("captain:",Response.data.captain)
+        console.log("captain details:", captain)
         setIsLoading(false)
       }
     })

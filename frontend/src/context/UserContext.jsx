@@ -1,5 +1,5 @@
 import React, {createContext, useState} from 'react'
-import axios from 'axios'
+
 
 
 
@@ -10,10 +10,10 @@ const UserContext = ({children}) => {
   const [user, setUser] = useState(null);
   return (
     <div>
-      <UserDataContext.Provider value={[user, setUser]}>
+    <UserDataContext.Provider value={{ user, setUser }}>
+  {children}
+</UserDataContext.Provider>
 
-     {children}
-      </UserDataContext.Provider>
     </div>
   )
 }

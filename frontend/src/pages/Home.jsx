@@ -7,9 +7,9 @@ import VehiclePanel from '../components/VehiclePanel';
 import ConfirmRide from '../components/ConfirmRide';
 import LiveTracking from '../components/LiveTracking';
 import LookingForDriver from '../components/LookingForDriver';
-import WaitingForDriver from '../components/WaitingForDriver';
+
 import { SocketContext } from "../context/SocketContext";
-import {UserDataContext} from "../context/SocketContext";
+import {UserDataContext} from "../context/UserContext";
 
 const Home = () => {
 const [ pickup, setPickup ] = useState('')
@@ -20,7 +20,6 @@ const panelCloseRef = useRef(null)
 const vehiclePanelRef = useRef(null)
 const confirmRidePanelRef = useRef(null)
 const vehicleFoundRef = useRef(null)
-const waitingForDriverRef = useRef(null)
 
 const [ activeField, setActiveField ] = useState('');
 const [ pickupSuggestions, setPickupSuggestions ] = useState([])
@@ -30,7 +29,7 @@ const [ confirmRidePanel, setConfirmRidePanel ] = useState('')
 const [ vehicleType, setVehicleType ] = useState('')
 const [fare, setFare ] = useState('')
 const [ vehicleFound, setVehicleFound ] = useState(false);
-const [waitingForDriver, setWaitingForDriver ]= useState(false);
+ 
 const [ride, setRide] = useState(null)
 
 const {socket} = useContext(SocketContext);
@@ -98,18 +97,6 @@ useEffect(() => {
         }
     }, [ vehicleFound ])
 
-
- useEffect( () => {
-        if (waitingForDriver) {
-            gsap.to(vehicleFoundRef.current, {
-                transform: 'translateY(0)'
-            })
-        } else {
-            gsap.to(vehicleFoundRef.current, {
-                transform: 'translateY(100%)'
-            })
-        }
-    }, [ waitingForDriver ])
 
 
 const handlePickupChange = async (e) => {
@@ -275,13 +262,7 @@ const handlePickupChange = async (e) => {
                     setVehicleFound={setVehicleFound} />
             </div>
 
-            <div ref={waitingForDriverRef} className='fixed w-full  z-10 bottom-0  bg-white px-3 py-6 pt-12'>
-                <WaitingForDriver
-                    ride={ride}
-                    setVehicleFound={setVehicleFound}
-                    setWaitingForDriver={setWaitingForDriver}
-                    waitingForDriver={waitingForDriver} />
-            </div>
+            
     </div>
   );
 };
