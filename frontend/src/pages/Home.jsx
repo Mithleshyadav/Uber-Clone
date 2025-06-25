@@ -7,6 +7,7 @@ import VehiclePanel from '../components/VehiclePanel';
 import ConfirmRide from '../components/ConfirmRide';
 import LiveTracking from '../components/LiveTracking';
 import LookingForDriver from '../components/LookingForDriver';
+import WaitingForDriver from '../components/WaitingForDriver';
 
 import { SocketContext } from "../context/SocketContext";
 import {UserDataContext} from "../context/UserContext";
@@ -20,6 +21,7 @@ const panelCloseRef = useRef(null)
 const vehiclePanelRef = useRef(null)
 const confirmRidePanelRef = useRef(null)
 const vehicleFoundRef = useRef(null)
+const waitingForDriverRef = useRef(null)
 
 const [ activeField, setActiveField ] = useState('');
 const [ pickupSuggestions, setPickupSuggestions ] = useState([])
@@ -29,7 +31,8 @@ const [ confirmRidePanel, setConfirmRidePanel ] = useState('')
 const [ vehicleType, setVehicleType ] = useState('')
 const [fare, setFare ] = useState('')
 const [ vehicleFound, setVehicleFound ] = useState(false);
- 
+ const [ waitingForDriver, setWaitingForDriver ] = useState(false)
+
 const [ride, setRide] = useState(null)
 
 const {socket} = useContext(SocketContext);
@@ -39,6 +42,12 @@ const {user} = useContext(UserDataContext)
 useEffect(() => {
   socket.emit('join', {userType: "user", userId:user._id})
 }, [user])
+
+socket.on('rideConfirmed', ride => {
+        setVehicleFound(false)
+        setWaitingForDriver(true)
+        setRide(ride)
+    })
 
 useEffect(() => {
     if (panelOpen) {
@@ -159,9 +168,7 @@ const handlePickupChange = async (e) => {
                 Authorization: `Bearer ${localStorage.getItem('token')}`
             }
         });
-        setRide(response.data);
-
-
+       
     }
 
 
@@ -262,6 +269,13 @@ const handlePickupChange = async (e) => {
                     setVehicleFound={setVehicleFound} />
             </div>
 
+            <div ref={waitingForDriverRef} className='fixed w-full  z-10 bottom-0  bg-white px-3 py-6 pt-12'>
+                <WaitingForDriver
+                    ride={ride}
+                    setVehicleFound={setVehicleFound}
+                    setWaitingForDriver={setWaitingForDriver}
+                    waitingForDriver={waitingForDriver} />
+            </div>
             
     </div>
   );

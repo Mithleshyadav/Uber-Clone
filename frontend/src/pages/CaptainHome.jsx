@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect, useContext } from 'react'
 import { Link } from 'react-router-dom'
 import CaptainDetails from '../components/CaptainDetails'
 import RidePopUp from '../components/RidePopUp';
-import  ConfirmridePopUp  from '../components/ConfirmRidePopUp';
+import  ConfirmRidePopUp  from '../components/ConfirmRidePopUp';
 
 import { SocketContext } from "../context/SocketContext";
 import { CaptainDataContext } from '../context/CaptainContext'
@@ -14,8 +14,6 @@ const CaptainHome = () => {
     const confirmRidePopupPanelRef = useRef(null)
     const [ ridePopupPanel, setRidePopupPanel ] = useState(false)
     const [ confirmRidePopupPanel, setConfirmRidePopupPanel ] = useState(false)
-
-
     const [ ride, setRide ] = useState(null)
 
     const { socket } = useContext(SocketContext)
@@ -118,8 +116,10 @@ const CaptainHome = () => {
                     confirmRide={confirmRide}
                 />
             </div>
-            <div ref= {confirmRidePopupPanelRef}>
-                <ConfirmridePopUp/>
+           <div ref={confirmRidePopupPanelRef} className='fixed w-full h-screen z-10 bottom-0 translate-y-full bg-white px-3 py-10 pt-12'>
+                <ConfirmRidePopUp
+                    ride={ride}
+                    setConfirmRidePopupPanel={setConfirmRidePopupPanel} setRidePopupPanel={setRidePopupPanel} />
             </div>
            
         </div>
