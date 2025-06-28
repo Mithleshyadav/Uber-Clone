@@ -49,6 +49,12 @@ socket.on('rideConfirmed', ride => {
         setRide(ride)
     })
 
+  socket.on('ride-started', ride => {
+        console.log("ride")
+        setWaitingForDriver(false)
+        navigate('/riding', { state: { ride } }) // Updated navigate to include ride data
+  })
+
 useEffect(() => {
     if (panelOpen) {
       gsap.to(panelRef.current, {
