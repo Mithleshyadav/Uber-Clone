@@ -10,10 +10,10 @@ const userSchema = new mongoose.Schema({
     minlength:[3, 'First name must be at least 3 characters long'],
   },
   lastname: {
-    type: String,
-    minlength:[3, 'Lastname must be at least 3 characters long'],
+    type: String
+   
   }
-},
+  },
 email: {
   type: String,
   required: true,
@@ -30,7 +30,7 @@ password: {
 socket: {
   type: String,
 },
-})
+});
 
 userSchema.methods.generateAuthToken = function () {
   const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET, { expiresIn: '1d' });

@@ -32,7 +32,7 @@ const UserSignup = () => {
 
       setUser(data.user)
       localStorage.setItem('token', data.token)
-      navigate('/home')
+      navigate('/login')
      }
 
       setEmail('')

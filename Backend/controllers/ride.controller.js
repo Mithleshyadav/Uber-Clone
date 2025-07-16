@@ -11,6 +11,8 @@ module.exports.getFare = async (req, res) => {
   }
   const { pickup, destination } = req.query;
 
+  console.log(pickup,"To",destination)
+
   try {
     const fare = await rideService.getFare(pickup, destination);
     console.log(fare);
@@ -26,41 +28,52 @@ module.exports.getFare = async (req, res) => {
 module.exports.createRide = async (req, res) => {
   const errors = validationResult(req);
   
-  if(!errors.isEmpty()){
+  if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  
+
   const { pickup, destination, vehicleType } = req.body;
 
   try {
-    const ride = await rideService.createRide({user:req.user._id, pickup, destination, vehicleType});
-    console.log(ride);
-    res.status(201).json(ride);
+    const ride = await rideService.createRide({
+      user: req.user._id,
+      pickup,
+      destination,
+      vehicleType
+    });
 
     const pickupCoords = await mapService.getAddressCoordinate(pickup);
 
-    const captainsInTheRadius = await rideService.getCaptainsInTheRadius(pickupCoords.ltd, pickupCoords.lng, 2);
+    const captainsInTheRadius = await mapService.getCaptainsInTheRadius(
+      pickupCoords.ltd,
+      pickupCoords.lng,
+      2
+    );
 
-    
-    console.log('Captains in the radius:', captainsInTheRadius)
-    ride.otp = "";
+    console.log('Captains in the radius:', captainsInTheRadius);
+
+    ride.otp = ""; // clear OTP before broadcasting
 
     const rideWithUser = await rideModel.findOne({ _id: ride._id }).populate('user');
 
-    captainsInTheRadius.map(captain => {
+    captainsInTheRadius.forEach(captain => {
       sendMessageToSocketId(captain.socketId, {
         event: 'newRide',
         data: rideWithUser
-      })
-    })
+      });
+    });
 
+    // ✅ Only send response after everything is successful
+    return res.status(201).json(ride);
+
+  } catch (err) {
+    console.error("createRide error:", err);
+    return res.status(500).json({
+      message: err.message || 'Failed to create ride'
+    });
   }
-  catch (err) {
-    return res.status(500).json({ message: err.message
- 
-    })
-  }
-}
+};
+
 
 module.exports.confirmRide = async (req, res) => {
   const errors = validationResult(req);
