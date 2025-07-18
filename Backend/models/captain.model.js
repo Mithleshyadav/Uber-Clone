@@ -27,7 +27,7 @@ const captainSchema = new mongoose.Schema({
     required: true,
     minlength: [6, 'Password must be at least 6 characters long'],
   },
-  socket: {
+  socketId: {
     type: String,
   },
   status: {
@@ -70,6 +70,8 @@ const captainSchema = new mongoose.Schema({
  },
 
 });
+
+captainSchema.index({ location: '2dsphere' });
 
 // Instance method to generate an authentication token
 captainSchema.methods.generateAuthToken = function () {
