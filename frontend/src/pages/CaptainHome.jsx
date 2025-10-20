@@ -19,6 +19,7 @@ const CaptainHome = () => {
   const { socket } = useContext(SocketContext)
   const { captain } = useContext(CaptainDataContext)
 
+  // ✅ Prevent running socket logic if captain is not yet loaded
   useEffect(() => {
     if (!socket || !captain?._id) return
 
@@ -49,13 +50,26 @@ const CaptainHome = () => {
     }
   }, [socket, captain])
 
-  socket.on('newRide', data => {
-    setRide(data)
-    console.log("data of newRide:", data);
-    setRidePopupPanel(true)
-  })
+  // ✅ Add safety: only listen once when socket exists
+  useEffect(() => {
+    if (!socket) return
 
-  async function confirmRide () {
+    const handleNewRide = data => {
+      setRide(data)
+      console.log('data of newRide:', data)
+      setRidePopupPanel(true)
+    }
+
+    socket.on('newRide', handleNewRide)
+
+    return () => {
+      socket.off('newRide', handleNewRide)
+    }
+  }, [socket])
+
+  async function confirmRide() {
+    if (!ride || !captain?._id) return
+
     const response = await axios.post(
       `${import.meta.env.VITE_BASE_URL}/rides/confirm-ride`,
       {
@@ -72,35 +86,38 @@ const CaptainHome = () => {
     setConfirmRidePopupPanel(true)
   }
 
-  useEffect(
-    function () {
-      if (ridePopupPanel) {
-        gsap.to(ridePopupPanelRef.current, {
-          transform: 'translateY(0)'
-        })
-      } else {
-        gsap.to(ridePopupPanelRef.current, {
-          transform: 'translateY(100%)'
-        })
-      }
-    },
-    [ridePopupPanel]
-  )
+  useEffect(() => {
+    if (ridePopupPanel) {
+      gsap.to(ridePopupPanelRef.current, {
+        transform: 'translateY(0)'
+      })
+    } else {
+      gsap.to(ridePopupPanelRef.current, {
+        transform: 'translateY(100%)'
+      })
+    }
+  }, [ridePopupPanel])
 
-  useEffect(
-    function () {
-      if (confirmRidePopupPanel) {
-        gsap.to(confirmRidePopupPanelRef.current, {
-          transform: 'translateY(0)'
-        })
-      } else {
-        gsap.to(confirmRidePopupPanelRef.current, {
-          transform: 'translateY(100%)'
-        })
-      }
-    },
-    [confirmRidePopupPanel]
-  )
+  useEffect(() => {
+    if (confirmRidePopupPanel) {
+      gsap.to(confirmRidePopupPanelRef.current, {
+        transform: 'translateY(0)'
+      })
+    } else {
+      gsap.to(confirmRidePopupPanelRef.current, {
+        transform: 'translateY(100%)'
+      })
+    }
+  }, [confirmRidePopupPanel])
+
+  // ✅ Add this condition before rendering CaptainDetails
+  if (!captain) {
+    return (
+      <div className='h-screen flex items-center justify-center'>
+        <p className='text-gray-600 text-lg font-medium'>Loading captain details...</p>
+      </div>
+    )
+  }
 
   return (
     <div className='h-screen'>
@@ -112,7 +129,7 @@ const CaptainHome = () => {
         />
         <Link
           to='/captain-home'
-          className=' h-10 w-10 bg-white flex items-center justify-center rounded-full'
+          className='h-10 w-10 bg-white flex items-center justify-center rounded-full'
         >
           <i className='text-lg font-medium ri-logout-box-r-line'></i>
         </Link>
@@ -153,3 +170,4 @@ const CaptainHome = () => {
 }
 
 export default CaptainHome
+

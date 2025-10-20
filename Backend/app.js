@@ -11,9 +11,11 @@ const captainRoutes = require('./routes/captain.routes');
 const mapsRoutes = require('./routes/maps.routes');
 const rideRoutes = require('./routes/ride.routes');
 
-const allowedOrigins = [
+
+  const allowedOrigins = [
   "http://localhost:5173",
-  "https://6jlfg5fk-5173.inc1.devtunnels.ms"
+  "https://f7nnvhsm-5173.inc1.devtunnels.ms"
+
 ];
 
 app.use(cors({

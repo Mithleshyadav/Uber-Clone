@@ -36,7 +36,7 @@ const CaptainSignup = () => {
       vehicleType,
     },
   };
-  console.log('Payload being sent:', newCaptain);
+
   try {
     const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/register`, newCaptain);
 

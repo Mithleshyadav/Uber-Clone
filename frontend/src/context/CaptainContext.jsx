@@ -1,4 +1,4 @@
-import React, {useState,  createContext} from 'react'
+import React, {useState,useEffect, createContext} from 'react'
 
 
 export const CaptainDataContext = createContext();
@@ -8,10 +8,16 @@ const CaptainContext = ({children}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const updateCaptain = (captain) => {
-    setCaptain(captain)
-  }
-const value = {captain, setCaptain, isLoading, setIsLoading, error, setError, updateCaptain}
+  useEffect(() => {
+    const storedCaptain = localStorage.getItem("captain");
+    if (storedCaptain) {
+      setCaptain(JSON.parse(storedCaptain));
+    }
+    setIsLoading(false);
+  }, []);
+
+ 
+const value = {captain, setCaptain, isLoading, setIsLoading, error, setError}
 
   return (
     <div>
