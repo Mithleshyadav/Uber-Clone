@@ -13,7 +13,7 @@ const rideRoutes = require('./routes/ride.routes');
 
 
   const allowedOrigins = [
-  "http://localhost:5173",
+  "http://localhost:4000",
   "https://f7nnvhsm-5173.inc1.devtunnels.ms"
 
 ];
