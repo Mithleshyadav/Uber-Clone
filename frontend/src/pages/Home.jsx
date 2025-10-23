@@ -41,6 +41,7 @@ const Home = () => {
         socket.emit("join", { userType: "user", userId: user._id })
 
         const handleRideConfirmed = (ride) => {
+            console.log("✅ rideConfirmed event received:", ride);
             setVehicleFound(false)
             setWaitingForDriver(true)
             setRide(ride)
