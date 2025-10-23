@@ -56,7 +56,6 @@ const CaptainHome = () => {
 
     const handleNewRide = data => {
       setRide(data)
-      console.log('data of newRide:', data)
       setRidePopupPanel(true)
     }
 

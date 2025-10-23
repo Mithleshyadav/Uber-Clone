@@ -16,7 +16,6 @@ const getFare = async (pickup, destination) => {
 
   // Step 2: Get distance and time
   const distanceTime = await mapService.getDistanceTime(pickupCoords, destinationCoords);
-  console.log('DistanceTime:', distanceTime);
 
   const distanceInKm = parseFloat(distanceTime.distanceInKm);
   const durationInMin = parseFloat(distanceTime.durationInMin);
@@ -54,7 +53,6 @@ function getOtp(num) {
   const min = Math.pow(10, num - 1); // e.g., 100000 for 6-digit
   const max = Math.pow(10, num);     // e.g., 1000000
   const otp = crypto.randomInt(min, max).toString();
-  console.log('OTP:', otp)
   return otp;
 
 }
@@ -95,7 +93,6 @@ module.exports.confirmRide = async ({rideId, captain}) => {
   _id: rideId
  }).populate('user').populate('captain').select('+otp');
 
-  console.log('Confirmed Ride:', ride);
  if (!ride) {
   throw new Error('Ride not found');
  }
@@ -110,7 +107,6 @@ module.exports.startRide = async ({ rideId, otp, captain }) => {
     const ride = await rideModel.findOne({
         _id: rideId
     }).populate('user').populate('captain').select('+otp');
-   console.log('Starting Ride:', ride);
     if (!ride) {
         throw new Error('Ride not found');
     }

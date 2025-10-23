@@ -53,7 +53,6 @@ module.exports.createRide = async (req, res) => {
       2
     );
 
-    console.log('Captains in the radius:', captainsInTheRadius);
 
     ride.otp = ''; // clear OTP before broadcasting
 
@@ -68,7 +67,6 @@ module.exports.createRide = async (req, res) => {
 
     return res.status(201).json(ride);
   } catch (err) {
-    console.error('createRide error:', err);
     return res.status(500).json({
       message: err.message || 'Failed to create ride',
     });
@@ -94,7 +92,6 @@ module.exports.confirmRide = async (req, res) => {
     return res.status(200).json(ride);
     
   } catch (err) {
-    console.log(err);
     return res.status(500).json({ message: err.message});
   }
 }
@@ -111,8 +108,6 @@ module.exports.startRide = async (req, res) => {
 
     try {
         const ride = await rideService.startRide({ rideId, otp, captain: req.captain });
-
-        console.log(ride);
 
         sendMessageToSocketId(ride.user.socketId, {
             event: 'ride-started',

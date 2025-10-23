@@ -40,7 +40,6 @@ module.exports.getAddressCoordinate = async (address) => {
 
     return { lat, lon };
   } catch (error) {
-    console.error('Geocoding failed:', error.message);
     throw new Error('Unable to fetch coordinates');
   }
 };
@@ -77,7 +76,6 @@ module.exports.getDistanceTime = async (originCoords, destinationCoords) => {
       durationInMin: (route.summary.duration / 60).toFixed(2),
     };
   } catch (error) {
-    console.error('Routing failed:', error.message);
     throw new Error('Unable to fetch distance and time');
   }
 };
@@ -102,7 +100,6 @@ module.exports.getAutoCompleteSuggestions = async (input) => {
 
     return suggestions;
   } catch (error) {
-    console.error('Autocomplete failed:', error.message);
     throw new Error('Unable to fetch autocomplete suggestions');
   }
 };
