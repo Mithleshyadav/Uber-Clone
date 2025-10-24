@@ -81,6 +81,7 @@ const CaptainHome = () => {
         }
       }
     )
+    console.log('Confirm ride response:', response.data)
     setRidePopupPanel(false)
     setConfirmRidePopupPanel(true)
   }
