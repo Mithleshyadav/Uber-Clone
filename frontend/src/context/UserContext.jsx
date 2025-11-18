@@ -9,12 +9,11 @@ const UserContext = ({ children }) => {
   const [authenticate, setAuthenticate] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const  resetCredentials = () => {
-   setUser(null);
-   setAuthenticate(false);
+  const resetCredentials = () => {
+    setUser(null);
+    setAuthenticate(false);
   };
 
-  // ✅ Check authentication on load
   const checkAuthUser = async () => {
     try {
       const response = await axios.get(
@@ -24,8 +23,6 @@ const UserContext = ({ children }) => {
 
       if (response.data?.success) {
         setUser(response.data?.user);
-        console.log("User auth check:", response.data?.user);
-        console.log("User auth status:", user)
         setAuthenticate(true);
       } else {
         resetCredentials();
@@ -41,20 +38,21 @@ const UserContext = ({ children }) => {
       setLoading(false);
     }
   };
-  
- useEffect(() => {
-  const role = localStorage.getItem("role");
 
-  if (role === "user") {
-    checkAuthUser(); // server validates
-  } else {
-    setLoading(false); // don't show checking...
-  }
-}, []);
+  useEffect(() => {
+    const role = localStorage.getItem("role");
 
+    if (role === "user") {
+      checkAuthUser();
+    } else {
+      setLoading(false);
+    }
+  }, []);
 
   return (
-    <UserDataContext.Provider value={{ user, setUser,authenticate, setAuthenticate, loading }}>
+    <UserDataContext.Provider
+      value={{ user, setUser, authenticate, setAuthenticate, loading }}
+    >
       {children}
     </UserDataContext.Provider>
   );

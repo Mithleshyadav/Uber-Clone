@@ -79,27 +79,6 @@ module.exports.loginUser = async (req, res, next) => {
 };
 
 
-
-// module.exports.logoutUser = async (req, res, next) => {
-//   try {
-//     res.clearCookie('token');
-//     const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
-
-//     if (!token) {
-//       return next(ApiError.badRequest("No token provided for logout"));
-//     }
-
-//     await blacklistTokenModel.create({ token });
-
-//     return res.status(200).json({
-//       success: true,
-//       message: 'Logged out successfully',
-//     });
-//   } catch (error) {
-//     next(ApiError.internal(error.message));
-//   }
-// };
-
 module.exports.logoutUser = async (req, res, next) => {
   try {
     const token =

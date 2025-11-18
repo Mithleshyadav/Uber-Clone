@@ -23,22 +23,18 @@ const CaptainLogin = () => {
         { withCredentials: true }
       );
 
-      console.log(response.data);
-
-      // ❌ If backend explicitly marks success false
       if (!response?.data?.success) {
         toast.error(response?.data?.message || "Login failed");
         toast.dismiss(toastId);
         return;
       }
 
-      // ✅ Success case
+     
       toast.success(response?.data?.message || "Successfully logged in");
       toast.dismiss(toastId);
 
       localStorage.setItem("role", "captain");
 
-      // ✅ Navigate safely after small delay
       setTimeout(() => {
         navigate("/captain-home");
       }, 300);
@@ -54,7 +50,7 @@ const CaptainLogin = () => {
         backendErrors.forEach((err) => toast.error(err.msg || JSON.stringify(err)));
       else toast.error(error.message || "Something went wrong!");
     } finally {
-      // 🧹 Clear inputs
+    
       setEmail("");
       setPassword("");
     }

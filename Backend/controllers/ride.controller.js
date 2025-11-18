@@ -1,39 +1,43 @@
-const rideService = require('../services/ride.service');
-const { validationResult } = require('express-validator');
-const mapService = require('../services/maps.service');
-const rideModel = require('../models/ride.model');
-const { sendMessageToSocketId } = require('../socket');
+const rideService = require("../services/ride.service");
+const { validationResult } = require("express-validator");
+const mapService = require("../services/maps.service");
+const rideModel = require("../models/ride.model");
+const { sendMessageToSocketId } = require("../socket");
 // 🧭 Helper from mapService
 const { getAddressCoordinate, getCaptainsInTheRadius } = mapService;
+const ApiError = require("../utils/ApiError");
 
-module.exports.getFare = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
 
-  const { pickup, destination } = req.query;
-
+module.exports.getFare = async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(ApiError.badRequest("Validation failed", errors.array()));
+    }
+
+    const { pickup, destination } = req.query;
+
     const fare = await rideService.getFare(pickup, destination);
-    return res.status(200).json(fare);
-  } catch (err) {
-    return res.status(500).json({
-      message: err.message || 'Internal Server Error',
+
+    return res.status(200).json({
+      success: true,
+      fare,
     });
+  } catch (error) {
+    next(ApiError.internal(error.message || "Internal Server Error"));
   }
 };
 
-module.exports.createRide = async (req, res) => {
-  const errors = validationResult(req);
 
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const { pickup, destination, vehicleType } = req.body;
-
+module.exports.createRide = async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(ApiError.badRequest("Validation failed", errors.array()));
+    }
+
+    const { pickup, destination, vehicleType } = req.body;
+
     const ride = await rideService.createRide({
       user: req.user._id,
       pickup,
@@ -42,105 +46,110 @@ module.exports.createRide = async (req, res) => {
     });
 
     const pickupCoords = await getAddressCoordinate(pickup);
-
-    if (!pickupCoords || typeof pickupCoords.lat !== 'number' || typeof pickupCoords.lon !== 'number') {
-      throw new Error('Invalid pickup coordinates received from ORS API');
+    if (!pickupCoords || typeof pickupCoords.lat !== "number" || typeof pickupCoords.lon !== "number") {
+      return next(ApiError.internal("Invalid pickup coordinates received from ORS API"));
     }
 
     const captainsInTheRadius = await getCaptainsInTheRadius(
-      pickupCoords.lat, // ✅ Corrected
-      pickupCoords.lon, // ✅ Corrected
+      pickupCoords.lat,
+      pickupCoords.lon,
       2
     );
 
+    ride.otp = ""; // clear OTP before broadcasting
 
-    ride.otp = ''; // clear OTP before broadcasting
-
-    const rideWithUser = await rideModel.findOne({ _id: ride._id }).populate('user');
+    const rideWithUser = await rideModel.findById(ride._id).populate("user");
 
     captainsInTheRadius.forEach((captain) => {
       sendMessageToSocketId(captain.socketId, {
-        event: 'newRide',
+        event: "newRide",
         data: rideWithUser,
       });
     });
 
-    return res.status(201).json(ride);
-  } catch (err) {
-    return res.status(500).json({
-      message: err.message || 'Failed to create ride',
+    return res.status(201).json({
+      success: true,
+      ride,
     });
+  } catch (error) {
+    next(ApiError.internal(error.message || "Failed to create ride"));
   }
 };
 
 
-module.exports.confirmRide = async (req, res) => {
-  const errors = validationResult(req);
-  if(!errors.isEmpty()){
-    return res.status(400).json({errors: errors.array()});
-
-  }
-  const { rideId } = req.body;
-
+module.exports.confirmRide = async (req, res, next) => {
   try {
-    const ride = await rideService.confirmRide({rideId, captain: req.captain});
-    console.log('Ride confirmed:',ride.user.socketId, ride)
-
-    sendMessageToSocketId(ride.user.socketId, {
-      event: 'rideConfirmed',
-      data: ride
-    })
-    return res.status(200).json(ride);
-    
-  } catch (err) {
-    return res.status(500).json({ message: err.message});
-  }
-}
-
-
-
-module.exports.startRide = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { rideId, otp } = req.query;
-
-    try {
-        const ride = await rideService.startRide({ rideId, otp, captain: req.captain });
-
-        sendMessageToSocketId(ride.user.socketId, {
-            event: 'ride-started',
-            data: ride
-        })
-
-        return res.status(200).json(ride);
-    } catch (err) {
-        return res.status(500).json({ message: err.message });
-    }
-}
-
-module.exports.endRide = async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+      return next(ApiError.badRequest("Validation failed", errors.array()));
     }
 
     const { rideId } = req.body;
 
-    try {
-        const ride = await rideService.endRide({ rideId, captain: req.captain });
+    const ride = await rideService.confirmRide({ rideId, captain: req.captain });
 
-        sendMessageToSocketId(ride.user.socketId, {
-            event: 'ride-ended',
-            data: ride
-        })
+    sendMessageToSocketId(ride.user.socketId, {
+      event: "rideConfirmed",
+      data: ride,
+    });
+
+    return res.status(200).json({
+      success: true,
+      ride,
+    });
+  } catch (error) {
+    next(ApiError.internal(error.message || "Failed to confirm ride"));
+  }
+};
 
 
+module.exports.startRide = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(ApiError.badRequest("Validation failed", errors.array()));
+    }
 
-        return res.status(200).json(ride);
-    } catch (err) {
-        return res.status(500).json({ message: err.message });
-    } 
-}
+    const { rideId, otp } = req.query;
+
+    const ride = await rideService.startRide({ rideId, otp, captain: req.captain });
+
+    sendMessageToSocketId(ride.user.socketId, {
+      event: "ride-started",
+      data: ride,
+    });
+
+    return res.status(200).json({
+      success: true,
+      ride,
+    });
+  } catch (error) {
+    next(ApiError.internal(error.message || "Failed to start ride"));
+  }
+};
+
+
+module.exports.endRide = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(ApiError.badRequest("Validation failed", errors.array()));
+    }
+
+    const { rideId } = req.body;
+
+    const ride = await rideService.endRide({ rideId, captain: req.captain });
+
+    sendMessageToSocketId(ride.user.socketId, {
+      event: "ride-ended",
+      data: ride,
+    });
+
+    return res.status(200).json({
+      success: true,
+      ride,
+    });
+  } catch (error) {
+    next(ApiError.internal(error.message || "Failed to end ride"));
+  }
+};

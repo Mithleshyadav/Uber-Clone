@@ -11,12 +11,11 @@ module.exports.createCaptain = async ({
   vehicleType,
   location, // 👈 include this
 }) => {
-  // Validate required fields
+
   if (!firstname || !email || !password || !color || !plate || !capacity || !vehicleType) {
     throw new Error('All fields are required');
   }
 
-  // Create a new captain instance
   const captain = await captainModel.create({
     fullname: {
       firstname,

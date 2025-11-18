@@ -15,12 +15,11 @@ const {errorMiddleware} = require('./middlewares/error.middleware');
 
 const allowedOrigins = [
   "https://uber-clone-wx8q.onrender.com"
-
+  
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (e.g., Postman, curl)
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {

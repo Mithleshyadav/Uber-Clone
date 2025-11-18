@@ -73,18 +73,12 @@ const captainSchema = new mongoose.Schema({
 
 captainSchema.index({ location: '2dsphere' });
 
-// Instance method to generate an authentication token
-captainSchema.methods.generateAuthToken = function () {
-  const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-  return token;
-};
 
-// Instance method to compare passwords
 captainSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
 
-// Static method to hash passwords
+
 captainSchema.statics.hashPassword = async function (password) {
   return await bcrypt.hash(password, 10);
 };

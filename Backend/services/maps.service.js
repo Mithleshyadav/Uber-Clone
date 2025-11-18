@@ -5,7 +5,7 @@ const ORS_API_KEY = process.env.ORS_API_KEY;
 const GEOCODE_URL = 'https://api.openrouteservice.org/geocode/search';
 const ROUTING_URL = 'https://api.openrouteservice.org/v2/directions/driving-car';
 
-// ✅ Coordinate validation function
+
 function isValidCoordinate(lat, lon) {
   return (
     typeof lat === 'number' &&
@@ -15,7 +15,7 @@ function isValidCoordinate(lat, lon) {
   );
 }
 
-// 🔍 Get coordinates for an address
+
 module.exports.getAddressCoordinate = async (address) => {
   if (!address) throw new Error('Address is required');
 
@@ -44,7 +44,7 @@ module.exports.getAddressCoordinate = async (address) => {
   }
 };
 
-// 🛣️ Get distance and time between two coordinates
+
 module.exports.getDistanceTime = async (originCoords, destinationCoords) => {
   if (!originCoords || !destinationCoords) {
     throw new Error('Origin and destination coordinates are required');
@@ -80,7 +80,7 @@ module.exports.getDistanceTime = async (originCoords, destinationCoords) => {
   }
 };
 
-// 🔍 Get autocomplete suggestions
+
 module.exports.getAutoCompleteSuggestions = async (input) => {
   if (!input) throw new Error('Input is required for suggestions');
 
@@ -104,7 +104,7 @@ module.exports.getAutoCompleteSuggestions = async (input) => {
   }
 };
 
-// 📍 Get nearby captains within radius
+
 module.exports.getCaptainsInTheRadius = async (lat, lon, radiusInKm) => {
   if (!isValidCoordinate(lat, lon)) {
     throw new Error('Invalid coordinates passed to ORS API');
@@ -125,7 +125,7 @@ module.exports.getCaptainsInTheRadius = async (lat, lon, radiusInKm) => {
   return captains;
 };
 
-// 🧭 Get isochrone polygon from ORS
+
 async function getIsochronePolygon(lat, lon, radiusInMeters) {
   if (!isValidCoordinate(lat, lon)) {
     throw new Error('Invalid coordinates passed to ORS API');
