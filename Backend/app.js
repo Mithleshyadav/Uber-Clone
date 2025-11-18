@@ -15,6 +15,7 @@ const {errorMiddleware} = require('./middlewares/error.middleware');
 
 const allowedOrigins = [
   "https://uber-clone-wx8q.onrender.com"
+
   
 ];
 

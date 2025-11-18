@@ -62,21 +62,16 @@ module.exports.getAutoCompleteSuggestions = async (req, res, next) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return next(ApiError.badRequest("Validation failed", errors.array()));
+      return res.status(400).json({ errors: errors.array() });
     }
 
     const { input } = req.query;
 
     const suggestions = await mapService.getAutoCompleteSuggestions(input);
-    if (!suggestions) {
-      return next(ApiError.notFound("No suggestions found"));
-    }
-
-    return res.status(200).json({
-      success: true,
-      suggestions,
-    });
-  } catch (error) {
-    next(ApiError.internal(error.message));
+    
+    res.status(200).json(suggestions);
+  } catch (err) {
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
+

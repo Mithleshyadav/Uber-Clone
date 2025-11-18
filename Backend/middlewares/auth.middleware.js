@@ -4,7 +4,6 @@
 // const jwt = require('jsonwebtoken');
 // const ApiError = require('../utils/ApiError.js');
 
-
 // // Middleware to authenticate a captain
 // module.exports.authCaptain = async (req, res, next) => {
 //   const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
@@ -35,8 +34,6 @@
 //   }
 // };
 
-
-
 // module.exports.authUser = async (req, res, next) => {
 //   try {
 //     const token = req.cookies.token || req.headers.authorization?.split(" ")[1];
@@ -57,7 +54,7 @@
 //     if (!user) {
 //       return next(ApiError.unauthorized("User not found. Invalid token."));
 //     }
-    
+
 //     req.user = user;
 
 //     next();
@@ -67,14 +64,11 @@
 //   }
 // };
 
-
-
-
-const userModel = require('../models/user.model.js');
-const captainModel = require('../models/captain.model.js');
-const blacklistTokenModel = require('../models/blacklistToken.model.js');
-const jwt = require('jsonwebtoken');
-const ApiError = require('../utils/ApiError.js');
+const userModel = require("../models/user.model.js");
+const captainModel = require("../models/captain.model.js");
+const blacklistTokenModel = require("../models/blacklistToken.model.js");
+const jwt = require("jsonwebtoken");
+const ApiError = require("../utils/ApiError.js");
 
 // Middleware to authenticate a captain
 module.exports.authCaptain = async (req, res, next) => {
@@ -88,12 +82,14 @@ module.exports.authCaptain = async (req, res, next) => {
   try {
     const isBlacklisted = await blacklistTokenModel.findOne({ token });
     if (isBlacklisted) {
-      return next(new ApiError(401, "Token is blacklisted. Please login again."));
+      return next(
+        new ApiError(401, "Token is blacklisted. Please login again.")
+      );
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const captain = await captainModel.findById(decoded._id);
-    console.log("captainfind", captain);
+
     if (!captain) {
       return next(new ApiError(401, "Captain not found. Invalid token."));
     }
@@ -101,7 +97,9 @@ module.exports.authCaptain = async (req, res, next) => {
     req.captain = captain;
     next();
   } catch (err) {
-    return next(new ApiError(401, "Invalid or expired captain token", [err.message]));
+    return next(
+      new ApiError(401, "Invalid or expired captain token", [err.message])
+    );
   }
 };
 
@@ -117,7 +115,9 @@ module.exports.authUser = async (req, res, next) => {
   try {
     const isBlacklisted = await blacklistTokenModel.findOne({ token });
     if (isBlacklisted) {
-      return next(new ApiError(401, "Token is blacklisted. Please login again."));
+      return next(
+        new ApiError(401, "Token is blacklisted. Please login again.")
+      );
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -130,9 +130,8 @@ module.exports.authUser = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    return next(new ApiError(401, "Invalid or expired user token", [error.message]));
+    return next(
+      new ApiError(401, "Invalid or expired user token", [error.message])
+    );
   }
 };
-
-
-

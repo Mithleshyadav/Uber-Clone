@@ -5,7 +5,6 @@ const blacklistTokenModel = require("../models/blacklistToken.model");
 const { genTokenAndSetCookie } = require("../services/genTokenAndSetCookie");
 const ApiError = require("../utils/ApiError");
 
-
 module.exports.registerCaptain = async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -50,7 +49,6 @@ module.exports.registerCaptain = async (req, res, next) => {
   }
 };
 
-
 module.exports.loginCaptain = async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -71,10 +69,7 @@ module.exports.loginCaptain = async (req, res, next) => {
       return next(ApiError.badRequest("Invalid email or password"));
     }
 
-    // ✅ Generate JWT and set in cookie (like user controller)
     const token = await genTokenAndSetCookie(captain._id, res, "captain_token");
-
-    console.log(token, "Captain successfully logged in");
 
     return res.status(200).json({
       success: true,
@@ -85,13 +80,12 @@ module.exports.loginCaptain = async (req, res, next) => {
   }
 };
 
-
 module.exports.getCaptainProfile = (req, res, next) => {
   try {
     if (!req.captain) {
       return next(ApiError.notFound("Captain not found"));
     }
-   console.log(req.captain, "Captain profile accessed");
+
     return res.status(200).json({
       success: true,
       captain: req.captain,
@@ -110,7 +104,6 @@ module.exports.logoutCaptain = async (req, res, next) => {
       return next(ApiError.badRequest("No captain token provided for logout"));
     }
 
-   
     await blacklistTokenModel.create({ token });
 
     // Clear captain cookie

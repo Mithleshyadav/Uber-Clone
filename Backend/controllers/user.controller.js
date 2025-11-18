@@ -1,11 +1,9 @@
-const userModel = require('../models/user.model');
-const { createUser } = require('../services/user.service');
-const {validationResult} = require('express-validator');
-const blacklistTokenModel = require('../models/blacklistToken.model');
-const {genTokenAndSetCookie }= require('../services/genTokenAndSetCookie');
-const ApiError = require('../utils/ApiError');
-
-
+const userModel = require("../models/user.model");
+const { createUser } = require("../services/user.service");
+const { validationResult } = require("express-validator");
+const blacklistTokenModel = require("../models/blacklistToken.model");
+const { genTokenAndSetCookie } = require("../services/genTokenAndSetCookie");
+const ApiError = require("../utils/ApiError");
 
 module.exports.registerUser = async (req, res, next) => {
   try {
@@ -13,7 +11,7 @@ module.exports.registerUser = async (req, res, next) => {
     if (!errors.isEmpty()) {
       return next(ApiError.badRequest("Validation failed", errors.array()));
     }
-  const {fullname,email, password} = req.body;
+    const { fullname, email, password } = req.body;
     const isUserAlreadyExist = await userModel.findOne({ email });
     if (isUserAlreadyExist) {
       return next(ApiError.badRequest("User already exists"));
@@ -21,17 +19,15 @@ module.exports.registerUser = async (req, res, next) => {
 
     const hashedPassword = await userModel.hashPassword(password);
 
-   const user = await createUser({
-    firstname: fullname.firstname,
-    lastname: fullname.lastname,
-    email, 
-    password: hashedPassword
-  });
+    const user = await createUser({
+      firstname: fullname.firstname,
+      lastname: fullname.lastname,
+      email,
+      password: hashedPassword,
+    });
     if (!user) {
       return next(ApiError.internal("Failed to create user"));
     }
-
-
 
     return res.status(201).json({
       success: true,
@@ -50,24 +46,19 @@ module.exports.loginUser = async (req, res, next) => {
     }
 
     const { email, password } = req.body;
-    console.log(email)
-    const user = await userModel.findOne({ email }).select('+password');
-    console.log(user)
+
+    const user = await userModel.findOne({ email }).select("+password");
+    
 
     if (!user) {
       return next(ApiError.badRequest("Invalid email or password"));
-
     }
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      console.log('invalid passsword')
       return next(ApiError.badRequest("Invalid email or password"));
     }
 
     const token = await genTokenAndSetCookie(user._id, res, "user_token");
-
-    console.log(token, "successfully loggedin")
-    
 
     return res.status(200).json({
       success: true,
@@ -77,7 +68,6 @@ module.exports.loginUser = async (req, res, next) => {
     next(ApiError.internal(error.message));
   }
 };
-
 
 module.exports.logoutUser = async (req, res, next) => {
   try {
@@ -108,9 +98,6 @@ module.exports.logoutUser = async (req, res, next) => {
   }
 };
 
-
-
-
 module.exports.checkAuth = async (req, res, next) => {
   try {
     const user = req.user;
@@ -118,7 +105,7 @@ module.exports.checkAuth = async (req, res, next) => {
     if (!user) {
       return next(ApiError.notFound("User validation failed"));
     }
-   
+
     return res.status(200).json({
       success: true,
       user,

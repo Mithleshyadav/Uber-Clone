@@ -24,8 +24,6 @@ const UserLogin = () => {
       );
 
      
-      console.log(response.data);
-
       if (!response?.data?.success) {
         toast.error(response?.data?.message || "Login failed");
         toast.dismiss(toastId);
@@ -37,7 +35,6 @@ const UserLogin = () => {
 
       localStorage.setItem("role", "user");
 
-      // ✅ Navigate inside useEffect-safe context
       setTimeout(() => {
         navigate("/home");
       }, 300);
