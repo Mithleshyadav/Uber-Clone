@@ -56,59 +56,58 @@ const LiveTracking = () => {
     return () => navigator.geolocation.clearWatch(watchId);
   }, []);
 
-  // Fetch route from ORS
-  // const fetchRouteFromORS = async (start, end) => {
-  //   try {
-  //     const response = await axios.post(
-  //       'https://api.openrouteservice.org/v2/directions/driving-car/geojson',
-  //       {
-  //         coordinates: [
-  //           [start[1], start[0]], // [lng, lat]
-  //           [end[1], end[0]],     // [lng, lat]
-  //         ],
-  //       },
-  //       {
-  //         headers: {
-  //           Authorization: import.meta.env.VITE_ORS_API_KEY,
-  //           'Content-Type': 'application/json',
-  //         },
-  //       }
-  //     );
-
-  //     // ORS returns [lng, lat], convert back to [lat, lng] for Leaflet
-  //     const coords = response.data.features[0].geometry.coordinates.map(
-  //       ([lng, lat]) => [lat, lng]
-  //     );
-  //     setRouteCoords(coords);
-  //   } catch (error) {
-  //     console.error('Failed to fetch route:', error);
-  //   }
-  // };
-
   const fetchRouteFromORS = async (start, end) => {
-  try {
-    const response = await axios.post(
-      `${import.meta.env.VITE_BASE_URL}/maps/route`,
-      { start, end },
-      { withCredentials: true }
-    );
+    try {
+      const response = await axios.post(
+        'https://api.openrouteservice.org/v2/directions/driving-car/geojson',
+        {
+          coordinates: [
+            [start[1], start[0]], // [lng, lat]
+            [end[1], end[0]],     // [lng, lat]
+          ],
+        },
+        {
+          headers: {
+            Authorization: import.meta.env.VITE_ORS_API_KEY,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
-    const geojson = response.data.data;
+      // ORS returns [lng, lat], convert back to [lat, lng] for Leaflet
+      const coords = response.data.features[0].geometry.coordinates.map(
+        ([lng, lat]) => [lat, lng]
+      );
+      setRouteCoords(coords);
+    } catch (error) {
+      console.error('Failed to fetch route:', error);
+    }
+  };
 
-    // Convert [lng, lat] → [lat, lng]
-    const coords = geojson.features[0].geometry.coordinates.map(
-      ([lng, lat]) => [lat, lng]
-    );
+//   const fetchRouteFromORS = async (start, end) => {
+//   try {
+//     const response = await axios.post(
+//       `${import.meta.env.VITE_BASE_URL}/maps/route`,
+//       { start, end },
+//       { withCredentials: true }
+//     );
 
-    // Update your state (same as old function)
-    setRouteCoords(coords);
+//     const geojson = response.data.data;
 
-    return coords;
-  } catch (error) {
-    console.error("Failed to fetch route:", error);
-    throw error;
-  }
-};
+//     // Convert [lng, lat] → [lat, lng]
+//     const coords = geojson.features[0].geometry.coordinates.map(
+//       ([lng, lat]) => [lat, lng]
+//     );
+
+//     // Update your state (same as old function)
+//     setRouteCoords(coords);
+
+//     return coords;
+//   } catch (error) {
+//     console.error("Failed to fetch route:", error);
+//     throw error;
+//   }
+// };
 
 
 

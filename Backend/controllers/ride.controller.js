@@ -29,57 +29,8 @@ module.exports.getFare = async (req, res, next) => {
 };
 
 
-// module.exports.createRide = async (req, res, next) => {
-//   try {
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) {
-//       return next(ApiError.badRequest("Validation failed", errors.array()));
-//     }
-
-//     const { pickup, destination, vehicleType } = req.body;
-
-//     const ride = await rideService.createRide({
-//       user: req.user._id,
-//       pickup,
-//       destination,
-//       vehicleType,
-//     });
-
-//     const pickupCoords = await getAddressCoordinate(pickup);
-//     if (!pickupCoords || typeof pickupCoords.lat !== "number" || typeof pickupCoords.lon !== "number") {
-//       return next(ApiError.internal("Invalid pickup coordinates received from ORS API"));
-//     }
-
-//     const captainsInTheRadius = await getCaptainsInTheRadius(
-//       pickupCoords.lat,
-//       pickupCoords.lon,
-//       2
-//     );
-
-//     ride.otp = ""; // clear OTP before broadcasting
-
-//     const rideWithUser = await rideModel.findById(ride._id).populate("user");
-
-//     captainsInTheRadius.forEach((captain) => {
-//       sendMessageToSocketId(captain.socketId, {
-//         event: "newRide",
-//         data: rideWithUser,
-//       });
-//     });
-
-//     return res.status(201).json({
-//       success: true,
-//       ride,
-//     });
-//   } catch (error) {
-//     next(ApiError.internal(error.message || "Failed to create ride"));
-//   }
-// };
-
-
 module.exports.createRide = async (req, res, next) => {
   try {
-    // Validate inputs
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return next(ApiError.badRequest("Validation failed", errors.array()));
@@ -87,7 +38,6 @@ module.exports.createRide = async (req, res, next) => {
 
     const { pickup, destination, vehicleType } = req.body;
 
-    // Create ride
     const ride = await rideService.createRide({
       user: req.user._id,
       pickup,
@@ -95,59 +45,109 @@ module.exports.createRide = async (req, res, next) => {
       vehicleType,
     });
 
-    // Convert pickup address to coordinates
     const pickupCoords = await getAddressCoordinate(pickup);
-    if (
-      !pickupCoords ||
-      typeof pickupCoords.lat !== "number" ||
-      typeof pickupCoords.lon !== "number"
-    ) {
+    if (!pickupCoords || typeof pickupCoords.lat !== "number" || typeof pickupCoords.lon !== "number") {
       return next(ApiError.internal("Invalid pickup coordinates received from ORS API"));
     }
 
-    // Get captains nearby
     const captainsInTheRadius = await getCaptainsInTheRadius(
       pickupCoords.lat,
       pickupCoords.lon,
       2
     );
 
-    // Remove OTP before sending broadcast
-    ride.otp = "";
+    ride.otp = ""; // clear OTP before broadcasting
 
-    // Populate user info
     const rideWithUser = await rideModel.findById(ride._id).populate("user");
 
-    // Send ride request to each captain in radius
-    for (const nearbyCaptain of captainsInTheRadius) {
-      // Re-fetch full captain document with socketId
-      const fullCaptain = await captainModel
-        .findById(nearbyCaptain._id)
-        .select("socketId");
-
-      if (!fullCaptain || !fullCaptain.socketId) {
-        console.log("❌ Captain has no active socket, skipping:", nearbyCaptain._id);
-        continue;
-      }
-
-      console.log("📤 Sending newRide to captain socket:", fullCaptain.socketId);
-
-      sendMessageToSocketId(fullCaptain.socketId, {
+    captainsInTheRadius.forEach((captain) => {
+      sendMessageToSocketId(captain.socketId, {
         event: "newRide",
         data: rideWithUser,
       });
-    }
+    });
 
-    // Send success response
     return res.status(201).json({
       success: true,
       ride,
     });
-
   } catch (error) {
     next(ApiError.internal(error.message || "Failed to create ride"));
   }
 };
+
+
+// module.exports.createRide = async (req, res, next) => {
+//   try {
+//     // Validate inputs
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//       return next(ApiError.badRequest("Validation failed", errors.array()));
+//     }
+
+//     const { pickup, destination, vehicleType } = req.body;
+
+//     // Create ride
+//     const ride = await rideService.createRide({
+//       user: req.user._id,
+//       pickup,
+//       destination,
+//       vehicleType,
+//     });
+
+//     // Convert pickup address to coordinates
+//     const pickupCoords = await getAddressCoordinate(pickup);
+//     if (
+//       !pickupCoords ||
+//       typeof pickupCoords.lat !== "number" ||
+//       typeof pickupCoords.lon !== "number"
+//     ) {
+//       return next(ApiError.internal("Invalid pickup coordinates received from ORS API"));
+//     }
+
+//     // Get captains nearby
+//     const captainsInTheRadius = await getCaptainsInTheRadius(
+//       pickupCoords.lat,
+//       pickupCoords.lon,
+//       2
+//     );
+
+//     // Remove OTP before sending broadcast
+//     ride.otp = "";
+
+//     // Populate user info
+//     const rideWithUser = await rideModel.findById(ride._id).populate("user");
+
+//     // Send ride request to each captain in radius
+//     for (const nearbyCaptain of captainsInTheRadius) {
+//       // Re-fetch full captain document with socketId
+//       const fullCaptain = await captainModel
+//         .findById(nearbyCaptain._id)
+//         .select("socketId");
+
+//       if (!fullCaptain || !fullCaptain.socketId) {
+//         console.log("❌ Captain has no active socket, skipping:", nearbyCaptain._id);
+//         continue;
+//       }
+
+//       console.log("📤 Sending newRide to captain socket:", fullCaptain.socketId);
+
+//       sendMessageToSocketId(fullCaptain.socketId, {
+//         event: "newRide",
+//         data: rideWithUser,
+//       });
+//     }
+
+//     // Send success response
+//     return res.status(201).json({
+//       success: true,
+//       ride,
+//     });
+
+//   } catch (error) {
+//     next(ApiError.internal(error.message || "Failed to create ride"));
+//   }
+// };
 
 
 
