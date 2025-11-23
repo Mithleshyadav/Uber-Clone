@@ -95,7 +95,6 @@ const fetchRouteFromORS = async (start, end) => {
     });
 
     if (!response.data.success || !response.data.data) {
-      console.error("No route data returned from backend");
       return;
     }
 
@@ -103,7 +102,7 @@ const fetchRouteFromORS = async (start, end) => {
       ([lng, lat]) => [lat, lng] // convert back to Leaflet format
     );
     setRouteCoords(coords);
-    console.log("Route fetched successfully:", coords);
+    
 
   } catch (error) {
     console.error("Failed to fetch route:", error);
