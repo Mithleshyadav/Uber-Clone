@@ -39,9 +39,9 @@ const CaptainContext = ({ children }) => {
   };
 
   useEffect(() => {
-    const role = localStorage.getItem("role");
+    const myrole = localStorage.getItem("myrole");
 
-    if (role === "captain") {
+    if (myrole === "captain") {
       checkAuthCaptain();
     } else {
       setLoading(false);

@@ -33,7 +33,7 @@ const CaptainLogin = () => {
       toast.success(response?.data?.message || "Successfully logged in");
       toast.dismiss(toastId);
 
-      localStorage.setItem("role", "captain");
+      localStorage.setItem("myrole", "captain");
 
       setTimeout(() => {
         navigate("/captain-home");

@@ -3,6 +3,7 @@ const router = express.Router();
 const authMiddleware = require('../middlewares/auth.middleware');
 const mapController = require('../controllers/map.controller');
 const { query } = require('express-validator')
+const axios = require("axios");
 
 router.get('/get-coordinates',
   query('address').isString().isLength({ min:3}), authMiddleware.authUser, mapController.getCoordinates
@@ -23,6 +24,38 @@ router.get('/get-coordinates',
 );
 
 
+
+
+router.post("/get-route", async (req, res) => {
+  try {
+    const { coordinates } = req.body; // [[lat1,lng1],[lat2,lng2]]
+    
+    const formattedCoords = coordinates.map(([lat, lng]) => [lng, lat]); // ORS wants [lng, lat]
+
+    const response = await axios.post(
+      "https://api.openrouteservice.org/v2/directions/driving-car/geojson",
+      { coordinates: formattedCoords },
+      {
+        headers: {
+          Authorization: process.env.ORS_API_KEY, // keep secret in backend .env
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.data.features || response.data.features.length === 0) {
+      return res.status(500).json({ success: false, message: "No route found" });
+    }
+
+    res.json({ success: true, data: response.data.features[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Unable to fetch route", error: err.message });
+  }
+});
+
+
+module.exports = router;
 
 
 // router.post("/route", async (req, res, next) => {
